@@ -21,27 +21,46 @@ const winningCombinations = [
 function handleCellClick(e) {
   const index = e.target.dataset.index;
 
-  if (board[index] === '' && gameActive) {
-    board[index] = currentPlayer;
-    e.target.textContent = currentPlayer;
-    e.target.classList.add('taken');
+  if (board[index] === '' && gameActive && currentPlayer === 'X') {
+    makeMove(index, 'X');
+    if (gameActive) computerMove();
+  }
+}
 
-    if (checkWin()) {
-      message.textContent = `${currentPlayer} wins!`;
-      gameActive = false;
-    } else if (board.every(cell => cell !== '')) {
-      message.textContent = 'It\'s a draw!';
-      gameActive = false;
-    } else {
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+function makeMove(index, player) {
+  board[index] = player;
+  const cell = document.querySelector(`[data-index='${index}']`);
+  cell.textContent = player;
+  cell.classList.add('taken');
+
+  if (checkWin(player)) {
+    message.textContent = `${player} wins!`;
+    gameActive = false;
+  } else if (board.every(cell => cell !== '')) {
+    message.textContent = 'It\'s a draw!';
+    gameActive = false;
+  } else {
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    if (currentPlayer === 'X') {
       message.textContent = `Player ${currentPlayer}'s turn`;
     }
   }
 }
 
-function checkWin() {
+function computerMove() {
+  let availableCells = board
+    .map((cell, index) => (cell === '' ? index : null))
+    .filter(index => index !== null);
+
+  if (availableCells.length > 0) {
+    const randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
+    makeMove(randomIndex, 'O');
+  }
+}
+
+function checkWin(player) {
   return winningCombinations.some(combination => {
-    return combination.every(index => board[index] === currentPlayer);
+    return combination.every(index => board[index] === player);
   });
 }
 
