@@ -1,16 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tic Tac Toe - Player vs Computer</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Cross Game | Designed by Denish</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Tic Tac Toe</h1>
-  <div id="gameBoard"></div>
-  <div id="message"></div>
-  <button id="reset">Reset Game</button>
-  <script src="script.js"></script>
+    <div class="container">
+        <h1 class="title">Neon Cross Game</h1>
+        <div class="scoreboard">
+            <p>Player X: <span id="scoreX">0</span></p>
+            <p>Player O: <span id="scoreO">0</span></p>
+        </div>
+        <div class="game-board">
+            <div class="cell" onclick="playerMove(0)"></div>
+            <div class="cell" onclick="playerMove(1)"></div>
+            <div class="cell" onclick="playerMove(2)"></div>
+            <div class="cell" onclick="playerMove(3)"></div>
+            <div class="cell" onclick="playerMove(4)"></div>
+            <div class="cell" onclick="playerMove(5)"></div>
+            <div class="cell" onclick="playerMove(6)"></div>
+            <div class="cell" onclick="playerMove(7)"></div>
+            <div class="cell" onclick="playerMove(8)"></div>
+        </div>
+        <h2 class="status">Player X's turn</h2>
+        <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+        <p class="footer">Designed by Denish</p>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
