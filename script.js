@@ -1,90 +1,79 @@
-// Author: Itachiffx
-const gameBoard = document.getElementById('gameBoard');
-const message = document.getElementById('message');
-const resetButton = document.getElementById('reset');
-
-let board = ['', '', '', '', '', '', '', '', ''];
-let currentPlayer = 'X';
+let board = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
 let gameActive = true;
+let scoreX = 0;
+let scoreO = 0;
 
-const winningCombinations = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6]
-];
+const statusText = document.querySelector(".status");
+const scoreXText = document.getElementById("scoreX");
+const scoreOText = document.getElementById("scoreO");
 
-function handleCellClick(e) {
-  const index = e.target.dataset.index;
+// Sound effects
+const clickSound = new Audio('https://www.fesliyanstudios.com/play-mp3/387');
+const winSound = new Audio('https://www.fesliyanstudios.com/play-mp3/396');
 
-  if (board[index] === '' && gameActive && currentPlayer === 'X') {
-    makeMove(index, 'X');
-    if (gameActive) computerMove();
-  }
-}
+function playerMove(index) {
+    if (board[index] === "" && gameActive) {
+        board[index] = currentPlayer;
+        document.getElementsByClassName("cell")[index].textContent = currentPlayer;
+        clickSound.play();
+        checkWinner();
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = `Player ${currentPlayer}'s turn`;
 
-function makeMove(index, player) {
-  board[index] = player;
-  const cell = document.querySelector(`[data-index='${index}']`);
-  cell.textContent = player;
-  cell.classList.add('taken');
-
-  if (checkWin(player)) {
-    message.textContent = `${player} wins!`;
-    gameActive = false;
-  } else if (board.every(cell => cell !== '')) {
-    message.textContent = 'It\'s a draw!';
-    gameActive = false;
-  } else {
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    if (currentPlayer === 'X') {
-      message.textContent = `Player ${currentPlayer}'s turn`;
+        setTimeout(() => {
+            if (currentPlayer === "O") aiMove();
+        }, 500);
     }
-  }
 }
 
-function computerMove() {
-  let availableCells = board
-    .map((cell, index) => (cell === '' ? index : null))
-    .filter(index => index !== null);
-
-  if (availableCells.length > 0) {
-    const randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
-    makeMove(randomIndex, 'O');
-  }
+function aiMove() {
+    let emptyCells = board.map((cell, index) => (cell === "" ? index : null)).filter(i => i !== null);
+    if (emptyCells.length > 0) {
+        let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        board[randomIndex] = "O";
+        document.getElementsByClassName("cell")[randomIndex].textContent = "O";
+        clickSound.play();
+        checkWinner();
+        currentPlayer = "X";
+        statusText.textContent = `Player X's turn`;
+    }
 }
 
-function checkWin(player) {
-  return winningCombinations.some(combination => {
-    return combination.every(index => board[index] === player);
-  });
+function checkWinner() {
+    const winConditions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]             // Diagonals
+    ];
+
+    for (let condition of winConditions) {
+        let [a, b, c] = condition;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            gameActive = false;
+            statusText.textContent = `Player ${board[a]} wins!`;
+            winSound.play();
+            board[a] === "X" ? scoreX++ : scoreO++;
+            updateScores();
+            return;
+        }
+    }
+
+    if (!board.includes("")) {
+        statusText.textContent = "It's a draw!";
+        gameActive = false;
+    }
+}
+
+function updateScores() {
+    scoreXText.textContent = scoreX;
+    scoreOText.textContent = scoreO;
 }
 
 function resetGame() {
-  board = ['', '', '', '', '', '', '', '', ''];
-  currentPlayer = 'X';
-  gameActive = true;
-  message.textContent = `Player ${currentPlayer}'s turn`;
-  gameBoard.innerHTML = '';
-  createBoard();
+    board.fill("");
+    document.querySelectorAll(".cell").forEach(cell => (cell.textContent = ""));
+    gameActive = true;
+    currentPlayer = "X";
+    statusText.textContent = "Player X's turn";
 }
-
-function createBoard() {
-  board.forEach((_, index) => {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    cell.dataset.index = index;
-    cell.addEventListener('click', handleCellClick);
-    gameBoard.appendChild(cell);
-  });
-}
-
-resetButton.addEventListener('click', resetGame);
-
-// Initialize the game
-message.textContent = `Player ${currentPlayer}'s turn`;
-createBoard();
